@@ -1,0 +1,55 @@
+[
+  {
+    "policyType": "homeowners",
+    "name": "Roghini",
+    "address": "123 main street",
+    "zip": "43035"
+  },
+  {
+    "policyType": "auto",
+    "name": "Roghini",
+    "address": "123 main street",
+    "zip": "43035"
+  },
+  {
+    "policyType": "renters",
+    "name": "krishnan",
+    "address": "1st street",
+    "city": "dublin"
+  },
+  {
+    "policyType": "auto",
+    "name": "Roghini",
+    "address": "123 main street",
+    "city": "columbus",
+    "zip": "43035"
+  },
+  {
+    "policyType": "renters",
+    "name": "krishnan",
+    "address": "1st street",
+    "city": "dublin",
+    "zip": "43017"
+  },
+  {
+    "policyType": "auto",
+    "name": "Roghini",
+    "address": "123 main street",
+    "city": "columbus",
+    "zip": "43035"
+  },
+  {
+    "policyType": "renters",
+    "name": "krishnan",
+    "address": "1st street",
+    "city": "dublin",
+    "zip": "43017"
+  },
+  {
+    "policyType": "auto",
+    "name": "Roghini",
+    "address": "123 main street",
+    "city": "columbus",
+    "zip": "43035"
+  }
+]

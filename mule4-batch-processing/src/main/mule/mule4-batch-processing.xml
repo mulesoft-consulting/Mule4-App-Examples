@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:validation="http://www.mulesoft.org/schema/mule/validation" xmlns:email="http://www.mulesoft.org/schema/mule/email"
+	xmlns:file="http://www.mulesoft.org/schema/mule/file"
+	xmlns:batch="http://www.mulesoft.org/schema/mule/batch" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/batch http://www.mulesoft.org/schema/mule/batch/current/mule-batch.xsd
+http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd
+http://www.mulesoft.org/schema/mule/email http://www.mulesoft.org/schema/mule/email/current/mule-email.xsd
+http://www.mulesoft.org/schema/mule/validation http://www.mulesoft.org/schema/mule/validation/current/mule-validation.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="dc5db6ba-bdbb-489f-9490-5adb3f3447ae" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<file:config name="File_Config" doc:name="File Config" doc:id="3735136b-29aa-40e3-b1cd-813fbfe98b45" >
+		<file:connection workingDir="${batch.record.source}" />
+	</file:config>
+	<validation:config name="Validation_Config" doc:name="Validation Config" doc:id="3741de1f-374a-4595-8cd5-f655e325a624" />
+	<http:request-config name="HTTP_Request_configuration" doc:name="HTTP Request configuration" doc:id="cf5c8f1c-4c03-4ee5-bf12-c1851460df6b">
+		<http:request-connection host="localhost" port="8081" />
+	</http:request-config>
+	<flow name="OtherPolicies" doc:id="3f867412-5503-45b4-a69e-a807eba708ca" >
+		<http:listener doc:name="/otherPolicies" doc:id="787923c7-b4fd-4215-84fe-e27a47d20564" config-ref="HTTP_Listener_config" path="/otherPolicies"/>
+		<ee:transform doc:name="Success" doc:id="2772533f-a459-4f6a-ba77-9ede9ecf98ad" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	response: "success"
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="AutoPolicies" doc:id="89cdae37-5a59-4e3f-9746-a59d0724e33c" >
+		<http:listener doc:name="/autoPolicies" doc:id="edada386-4348-4596-8b16-16efc851de59" config-ref="HTTP_Listener_config" path="/autoPolicies"/>
+		<ee:transform doc:name="Success" doc:id="d4b00729-7244-4e84-b728-450cfe8f712a" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	response: "success"
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="RentersPolicies" doc:id="7d9a47c7-66e5-4dae-8af0-b8358b1feced" >
+		<http:listener doc:name="/rentersPolicies" doc:id="d86d3751-36c8-4c6e-9288-7e315bbebe4c" config-ref="HTTP_Listener_config" path="/rentersPolicies"/>
+		<ee:transform doc:name="Success" doc:id="659c41e1-3da0-4389-bf40-7216849a3b1d" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	response: "success"
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="Foreach-Example" doc:id="d5873c40-4a17-47b5-9219-3f44cc740ddd" initialState="stopped">
+		<file:listener doc:name="On New or Updated File" doc:id="53b7fe82-d09c-4af0-b204-84bf21d9ba5f" config-ref="File_Config" directory="input\">
+			<scheduling-strategy >
+				<fixed-frequency />
+			</scheduling-strategy>
+		</file:listener>
+		<ee:transform doc:name="Transform Message" doc:id="a0b700f1-00de-48c4-bf07-d8c0f26a2cc7" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<foreach doc:name="For Each" doc:id="1cff1363-5160-40a7-a749-f224524eeeb6" collection="#[payload]">
+			<logger level="INFO" doc:name="Logger" doc:id="a128aa2e-d08b-41e7-a854-defeb452ce59" message="#[payload]"/>
+		</foreach>
+	</flow>
+	<flow name="Batch-Procee-Example" doc:id="2a4ebfd0-b461-401b-95d7-39e5eeafe3c2">
+		<file:listener doc:name="On New or Updated File" doc:id="cc238cd2-d028-445c-ae17-28cb2b4e9b80" config-ref="File_Config" directory="input\" autoDelete="true">
+			<scheduling-strategy>
+				<fixed-frequency />
+			</scheduling-strategy>
+		</file:listener>
+		<logger level="INFO" doc:name="Batch Execution Begins" doc:id="e0cd5002-ff58-40d3-bdd3-d09670c7fe49" message="Before Batch Execution" />
+		<batch:job jobName="mule4-batch-processing-example" doc:id="20d4f31b-5774-4377-9138-263d4f6d858a" maxFailedRecords="-1" blockSize="${batch.size}">
+			<batch:process-records>
+				<batch:step name="Process_All_Policies" doc:id="d18e753b-5aaa-4819-a7b1-f3fc608e851d">
+					<set-variable value="#[payload.policyType]" doc:name="policyType" doc:id="c366ee67-aeaa-482d-aaa9-35b7263449a6" variableName="policyType" />
+				</batch:step>
+				<batch:step name="Process_Auto_Policies" doc:id="47155910-8b1a-475f-8281-8c2f302c7f10" acceptExpression='#[payload.policyType=="auto"]'>
+					<logger level="INFO" doc:name="policyType" doc:id="d4e736d9-b12e-4004-bde0-1c3be416cf3c" message='#["Policy:" ++ (vars.policyType default "")]' />
+					<set-variable value="#[payload.city]" doc:name="city" doc:id="3a2f0234-47a0-4e03-8b44-82e477ae1706" variableName="city" />
+					<validation:is-not-null doc:name="vars.city" doc:id="e42eaaed-aa7f-4f27-b02f-12d60c01a39d" config-ref="Validation_Config" value="#[vars.city]" message="city is required" />
+					<http:request method="POST" doc:name="POST /autoPolicies" doc:id="2f8b652d-3adf-4d9c-8108-5aed244cafa4" config-ref="HTTP_Request_configuration" path="/autoPolicies" target="autoPolicies"/>
+				</batch:step>
+				<batch:step name="Process_Renters_Policies" doc:id="801862c2-486b-481c-997c-766c58a98da3" acceptExpression='#[payload.policyType=="renters"]'>
+					<logger level="INFO" doc:name="policyType &amp; city" doc:id="6069ff77-3cc9-4aac-8dd2-95cdbec0a098" message='#["Policy:" ++ (vars.policyType default "") ++ "--city:" ++ (vars.city default "")]' />
+					<set-variable value="#[payload.zip]" doc:name="zip" doc:id="5140ddf8-a105-4d80-8b6a-2aa3c2641775" variableName="zip" />
+					<validation:is-not-null doc:name="vars.zip" doc:id="1d1e2228-8fdd-4ed1-8679-df1204c044bf" config-ref="Validation_Config" value="#[vars.zip]" message="zipcode is required" />
+					<http:request method="POST" doc:name="POST /rentersPolicies" doc:id="52551f10-5817-437f-ad99-c37d98ca16cc" config-ref="HTTP_Request_configuration" path="/rentersPolicies" target="renterPolicies"/>
+				</batch:step>
+				<batch:step name="Process_Other_Policies_Handle_Failures_Seperately" doc:id="98dafd01-979f-4238-a7f4-ce02a13ba822" acceptExpression='#[(payload.policyType != "renters") and (payload.policyType != "auto")]'>
+					<logger level="INFO" doc:name="policyType , city &amp; zip" doc:id="f9396449-f037-4797-b54c-4fec3e5db7ab" message='#["Policy:" ++ (vars.policyType default "") ++ "--city:" ++ (vars.city default "") ++ "--zip:" ++ (vars.zip default "")]' />
+					<set-variable value="#[payload.name]" doc:name="name" doc:id="c1a37a0b-c0e3-4059-a1cb-2177eeaca334" variableName="name" />
+					<try doc:name="Try" doc:id="fc8b3a37-aa5a-4dfd-8514-8653de42dbb3">
+						<validation:is-not-null doc:name="name" doc:id="bf1ca9a8-458d-4398-82cf-ad453445bbad" config-ref="Validation_Config" value="#[vars.name]" message="name is required" />
+						<http:request method="POST" doc:name="/otherPolicies" doc:id="6a787a60-4e13-46ee-b1c7-da0f83aa5e87" config-ref="HTTP_Request_configuration" path="/otherPolicies" target="otherPolicies"/>
+						<choice doc:name="Choice" doc:id="bc2bd5a4-d1a4-4683-a488-160bdd0e78ab">
+						<when expression='#[vars.otherPolicies.response == "success"]'>
+							<logger level="INFO" doc:name="Logger" doc:id="9d2ee056-9946-4123-865a-67e7c3883c9d" message="other policy Records Updated" />
+						</when>
+							<otherwise >
+								<raise-error doc:name="Raise error" doc:id="7b3c4996-f1f8-47c2-a262-758e3c8d2c46" type="APP:PROCESS_ERROR"/>
+							</otherwise>
+					</choice>
+						<error-handler>
+							<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="157b664d-199b-45a5-bb9d-dbaa9dc541e7">
+								<logger level="INFO" doc:name="Send failed records to a different destination" doc:id="34f14963-dfb9-49e4-b587-5e7ccb6681cc" message="Send failed records to a different destination" />
+							</on-error-continue>
+						</error-handler>
+					</try>
+				</batch:step>
+				<batch:step name="Failures_Auto_and_Renters_Policies" doc:id="245ab0b1-7b86-4cf0-a0c1-b543c8fc7c68" acceptPolicy="ONLY_FAILURES">
+					<batch:aggregator doc:name="Batch Aggregator" doc:id="c7b6274d-2242-451f-a30a-9a26bd6d4c39" size="${error.aggregation.size}">
+						<ee:transform doc:name="Transform Message" doc:id="105436df-d4bb-4479-b90c-82a9e97cb35d">
+							<ee:message>
+							</ee:message>
+							<ee:variables >
+								<ee:set-variable variableName="failedRecords" ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-variable>
+							</ee:variables>
+						</ee:transform>
+						<file:write doc:name="Write to error-records.json" doc:id="bf4988fc-e59e-4a0b-ba11-a8a3a6e066bf" config-ref="File_Config" path='#["error-records-of-batchjob-" ++ (vars.batchJobInstanceId) as String ++ ".json"]' >
+							<file:content ><![CDATA[#[vars.failedRecords]]]></file:content>
+						</file:write>
+					</batch:aggregator>
+				</batch:step>
+			</batch:process-records>
+			<batch:on-complete>
+				<scatter-gather doc:name="Scatter-Gather" doc:id="89425f40-160f-4a2d-8f3d-b46eb0cbfdbd">
+					<route>
+						<ee:transform doc:name="Batch Summary" doc:id="5986854d-f8e6-45e8-8660-2c5430755a3e">
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+batchJobInstanceId: payload.batchJobInstanceId,
+elapsedTimeInMillis: payload.elapsedTimeInMillis,
+failedOnCompletePhase: payload.failedOnCompletePhase,
+failedOnInputPhase: payload.failedOnCompletePhase,
+failedOnLoadingPhase: payload.failedOnLoadingPhase,
+failedRecords: payload.failedRecords,
+loadedRecords:payload.loadedRecords,
+inputPhaseException: payload.inputPhaseException,
+loadingPhaseException:payload.loadingPhaseException,
+onCompletePhaseException:payload.onCompletePhaseException,
+processedRecords:payload.processedRecords,
+successfulRecords:payload.successfulRecords,
+totalRecords:payload.totalRecords,
+stepResults: payload.stepResults
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+						<file:write doc:name="Write Summary report to file" doc:id="cd011d75-a005-45a6-93a8-acba18a9acc5" config-ref="File_Config" path='#["batch-report-" ++ (now() as String {"format": "YYYYMMdd-HH-mm-SS"}) ++ ".json"]' mode="CREATE_NEW" createParentDirectories="false" />
+					</route>
+					<route>
+						<logger level="INFO" doc:name="Batch Process Completed !" doc:id="2d857262-5037-4668-ae92-30049b27754c" message="Batch Process Completed !" />
+					</route>
+				</scatter-gather>
+			</batch:on-complete>
+		</batch:job>
+		<logger level="INFO" doc:name="Batch Flow Completed" doc:id="be2fcfaa-3855-4a3c-8cc4-f2965a92ce06" message="Batch Flow Completed" />
+	</flow>
+</mule>
